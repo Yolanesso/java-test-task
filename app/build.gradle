@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.filefilter'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+}
+
+application {
+    mainClass = 'com.filefilter.Main'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Правильная конфигурация JAR
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.filefilter.Main'
+        )
+    }
+    
+    // Создаем fat JAR со всеми зависимостями
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveBaseName = 'file-filter'
+    archiveVersion = ''  // убираем версию из имени
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
